@@ -1,12 +1,12 @@
 # RetentionAnalytics: User Retention & Funnel Analytics
 
-A portfolio project replicating large-scale consumer product analytics workflows — built end-to-end in R, covering conversion funnel analysis, cohort retention modeling, DAU/MAU tracking, predictive power-user identification, and A/B experimentation design.
+A portfolio project replicating large-scale consumer product analytics workflows - built end-to-end in R, covering conversion funnel analysis, cohort retention modeling, DAU/MAU tracking, predictive power-user identification, and A/B experimentation design.
 
 ---
 
 ## Why This Project Exists
 
-Retention and funnel analytics are the operational backbone of product data science. Understanding where users drop out of the funnel, which cohorts retain best, what behaviors predict long-term engagement, and how to design rigorous experiments to test interventions — these are the core questions product teams and growth teams answer every day.
+Retention and funnel analytics are the operational backbone of product data science. Understanding where users drop out of the funnel, which cohorts retain best, what behaviors predict long-term engagement, and how to design rigorous experiments to test interventions - these are the core questions product teams and growth teams answer every day.
 
 This project builds that entire stack from first principles in R, with outputs designed for both technical stakeholders (model metrics, statistical test results) and non-technical ones (Shiny dashboards, self-serve KPI tracking).
 
@@ -14,24 +14,24 @@ This project builds that entire stack from first principles in R, with outputs d
 
 ## What It Does
 
-**Module 1 — Data Simulation**
+**Module 1 - Data Simulation**
 - 5,000 users across 12 monthly signup cohorts
 - Acquisition channels, device types, plan types, and behavioral features
 - Stochastic funnel completion and monthly retention with power-user boost
 
-**Module 2 — Conversion Funnel**
+**Module 2 - Conversion Funnel**
 - End-to-end funnel: signup → onboarding → activation → engagement → conversion
-- Step-over-step drop-off identification — 3 critical intervention points flagged
+- Step-over-step drop-off identification - 3 critical intervention points flagged
 - Conversion segmented by plan type and acquisition channel
 - Projected activation lift scenario modeled downstream
 
-**Module 3 — Retention Cohorts & DAU/MAU**
+**Module 3 - Retention Cohorts & DAU/MAU**
 - Monthly retention curves by plan type and power-user segment
 - Month-6 retention by signup cohort (north star metric)
 - DAU/MAU stickiness ratio computed and trended over 3 months
 - Session engagement metrics (session length, actions per session)
 
-**Module 4 — Predictive Model & Experimentation**
+**Module 4 - Predictive Model & Experimentation**
 - Logistic regression model predicting 6-month retention from first-month signals
 - Power user behavioral signature extracted from feature importance
 - Full A/B testing framework: hypothesis definition, power analysis, metric selection, novelty-effect correction, guardrail metric evaluation
@@ -112,7 +112,7 @@ quarto::quarto_render("retentionanalytics_report.qmd")
 
 ## Why This Matters for Product Teams
 
-Retention and funnel analytics require a combination of statistical precision (correct cohort definition, valid A/B testing, novelty-effect awareness) and product intuition (which metrics matter, which drop-off points are actionable). This project demonstrates both — and delivers outputs in formats that serve data scientists, product managers, and leadership simultaneously.
+Retention and funnel analytics require a combination of statistical precision (correct cohort definition, valid A/B testing, novelty-effect awareness) and product intuition (which metrics matter, which drop-off points are actionable). This project demonstrates both - and delivers outputs in formats that serve data scientists, product managers, and leadership simultaneously.
 
 ---
 

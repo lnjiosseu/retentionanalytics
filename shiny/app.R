@@ -8,22 +8,22 @@ library(tidyverse)
 
 load_data <- function() {
   list(
-    users         = read_csv("data/users.csv",                          show_col_types = FALSE),
-    funnel        = read_csv("outputs/funnel_overall.csv",              show_col_types = FALSE),
-    funnel_plan   = read_csv("outputs/funnel_by_plan.csv",              show_col_types = FALSE),
-    funnel_ch     = read_csv("outputs/funnel_by_channel.csv",           show_col_types = FALSE),
-    ret_overall   = read_csv("outputs/retention_curve_overall.csv",     show_col_types = FALSE),
-    ret_plan      = read_csv("outputs/retention_by_plan.csv",           show_col_types = FALSE),
-    ret_power     = read_csv("outputs/retention_by_power.csv",          show_col_types = FALSE),
-    m6_cohort     = read_csv("outputs/m6_retention_by_cohort.csv",      show_col_types = FALSE),
-    dau_mau       = read_csv("outputs/dau_mau_summary.csv",             show_col_types = FALSE),
-    dau           = read_csv("outputs/daily_active_users.csv",          show_col_types = FALSE),
-    engagement    = read_csv("outputs/engagement_trend.csv",            show_col_types = FALSE),
-    feat_imp      = read_csv("outputs/power_user_feature_importance.csv",show_col_types = FALSE),
-    ret_metrics   = read_csv("outputs/retention_model_metrics.csv",     show_col_types = FALSE),
-    ab_summary    = read_csv("outputs/ab_experiment_summary.csv",       show_col_types = FALSE),
-    ab_novelty    = read_csv("outputs/ab_novelty_correction.csv",       show_col_types = FALSE),
-    dropoffs      = read_csv("outputs/funnel_dropoffs.csv",             show_col_types = FALSE)
+    users         = read_csv("../data/users.csv",                          show_col_types = FALSE),
+    funnel        = read_csv("../outputs/funnel_overall.csv",              show_col_types = FALSE),
+    funnel_plan   = read_csv("../outputs/funnel_by_plan.csv",              show_col_types = FALSE),
+    funnel_ch     = read_csv("../outputs/funnel_by_channel.csv",           show_col_types = FALSE),
+    ret_overall   = read_csv("../outputs/retention_curve_overall.csv",     show_col_types = FALSE),
+    ret_plan      = read_csv("../outputs/retention_by_plan.csv",           show_col_types = FALSE),
+    ret_power     = read_csv("../outputs/retention_by_power.csv",          show_col_types = FALSE),
+    m6_cohort     = read_csv("../outputs/m6_retention_by_cohort.csv",      show_col_types = FALSE),
+    dau_mau       = read_csv("../outputs/dau_mau_summary.csv",             show_col_types = FALSE),
+    dau           = read_csv("../outputs/daily_active_users.csv",          show_col_types = FALSE),
+    engagement    = read_csv("../outputs/engagement_trend.csv",            show_col_types = FALSE),
+    feat_imp      = read_csv("../outputs/power_user_feature_importance.csv",show_col_types = FALSE),
+    ret_metrics   = read_csv("../outputs/retention_model_metrics.csv",     show_col_types = FALSE),
+    ab_summary    = read_csv("../outputs/ab_experiment_summary.csv",       show_col_types = FALSE),
+    ab_novelty    = read_csv("../outputs/ab_novelty_correction.csv",       show_col_types = FALSE),
+    dropoffs      = read_csv("../outputs/funnel_dropoffs.csv",             show_col_types = FALSE)
   )
 }
 
