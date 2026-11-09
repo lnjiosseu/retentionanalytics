@@ -2,7 +2,13 @@
 suppressPackageStartupMessages({
   library(shiny); library(bslib); library(tidyverse); library(scales)
 })
-root <- if (dir.exists("corrected_r/outputs")) {\n  "corrected_r/outputs"\n} else if (dir.exists(file.path("..", "corrected_r", "outputs"))) {\n  file.path("..", "corrected_r", "outputs")\n} else {\n  stop("Cannot find corrected_r/outputs. Run the corrected scripts from the repository root first.")\n}
+root <- if (dir.exists("corrected_r/outputs")) {
+  "corrected_r/outputs"
+} else if (dir.exists(file.path("..", "corrected_r", "outputs"))) {
+  file.path("..", "corrected_r", "outputs")
+} else {
+  stop("Cannot find corrected_r/outputs. Run the corrected scripts from the repository root first.")
+}
 read_out <- function(file) read_csv(file.path(root, file), show_col_types = FALSE)
 d <- list(
   funnel = read_out("funnel_overall.csv"),
