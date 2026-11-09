@@ -110,9 +110,20 @@ server <- function(input, output, session) {
     ggplot(d$channel,aes(reorder(acquisition_channel,conversion_pct),conversion_pct))+
       geom_col(fill="#27936f")+coord_flip()+labs(x=NULL,y="Conversion (%)")+theme_minimal()
   })
-  output$plan <- renderTable(d$plan, digits=1)
-  output$drop <- renderTable(d$drop, digits=1)
-  output$projection <- renderTable(d$projection, digits=1)
+  output$plan <- renderTable(d$plan |>
+    rename(Plan = plan_type, Users = n_users,
+           `Onboarding (%)` = completed_onboarding_pct,
+           `Activation (%)` = completed_activation_pct,
+           `Engagement (%)` = completed_engagement_pct,
+           `Conversion (%)` = completed_conversion_pct), digits=1)
+  output$drop <- renderTable(d$drop |>
+    rename(Step = step, Users = users, `Share of signups (%)` = pct_of_signups,
+           `Step conversion (%)` = step_conversion_pct,
+           `Step drop-off (%)` = step_dropoff_pct), digits=1)
+  output$projection <- renderTable(d$projection |>
+    rename(Scenario = scenario, `Activation rate (%)` = activation_rate_pct,
+           `Projected conversions` = projected_conversions,
+           `Relative lift (%)` = relative_conversion_lift_pct), digits=1)
   output$retention <- renderPlot({
     ggplot(d$ret,aes(months_since_signup,retention_rate_pct))+
       geom_line(linewidth=1.1,color="#2878a5")+geom_point()+
@@ -142,7 +153,7 @@ server <- function(input, output, session) {
       )
     ggplot(cohort_plot,aes(cohort_label,m6_retention_pct))+
       geom_col(fill="#8064a2",width=.72)+
-      geom_text(aes(label=paste0(round(m6_retention_pct,1),"%\\nn=",cohort_size)),
+      geom_text(aes(label=paste0(round(m6_retention_pct,1),"%\nn=",cohort_size)),
                 vjust=-.25,size=3)+
       scale_y_continuous(limits=c(0,100),breaks=seq(0,100,20),
                          labels=label_number(suffix="%"),
@@ -152,8 +163,14 @@ server <- function(input, output, session) {
       theme_minimal()+
       theme(axis.text.x=element_text(angle=35,hjust=1))
   })
-  output$stickiness <- renderTable(d$dau_mau,digits=1)
-  output$engagement <- renderTable(d$engagement,digits=1)
+  output$stickiness <- renderTable(d$dau_mau |>
+    rename(Month = year_month, `Average DAU` = avg_dau, MAU = mau,
+           `DAU/MAU (%)` = avg_dau_mau_pct, `Days` = calendar_days), digits=1)
+  output$engagement <- renderTable(d$engagement |>
+    rename(Month = year_month, Sessions = sessions,
+           `Avg. session (min)` = avg_session_length_min,
+           `Actions/session` = avg_actions_per_session,
+           `Active users` = unique_active_users), digits=1)
   output$dau <- renderPlot({
     ggplot(d$dau,aes(session_date,dau))+geom_line(color="#2878a5")+
       labs(x="Date",y="Daily active users")+theme_minimal()
@@ -165,7 +182,12 @@ server <- function(input, output, session) {
       labs(x=NULL,y="Logistic regression coefficient")+theme_minimal()
   })
   output$ab <- renderTable(d$ab,digits=1)
-  output$abtests <- renderTable(d$ab_tests,digits=3)
+  output$abtests <- renderTable(d$ab_tests |>
+    mutate(p_value_one_sided = if_else(p_value_one_sided < 0.001, "<0.001",
+                                       formatC(p_value_one_sided, format="f", digits=3))) |>
+    rename(Period = period, `Treatment effect (pp)` = treatment_minus_control_pp,
+           `One-sided p-value` = p_value_one_sided,
+           `N per arm` = n_per_arm), digits=3)
   output$abassumptions <- renderTable(d$ab_assumptions)
 }
 shinyApp(ui,server)
