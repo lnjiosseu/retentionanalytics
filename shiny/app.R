@@ -147,7 +147,7 @@ server <- function(input, output, session) {
       scale_y_continuous(limits=c(0,100),breaks=seq(0,100,20),
                          labels=label_number(suffix="%"),
                          expand=expansion(mult=c(0,.12)))+
-      scale_x_discrete(breaks=levels(cohort_plot$cohort_label)[seq(1,nlevels(cohort_plot$cohort_label),by=2)])+
+      scale_x_discrete(breaks=levels(cohort_plot$cohort_label)[seq(1,nlevels(cohort_plot$cohort_label),by=2)]) )+
       labs(x="Signup cohort",y="Month-6 retention (%)")+
       theme_minimal()+
       theme(axis.text.x=element_text(angle=35,hjust=1))
