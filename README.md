@@ -19,9 +19,9 @@ Product analytics requires more than reporting a single conversion or retention 
 
 This project brings these analyses together while distinguishing descriptive metrics, predictive associations, mechanical scenarios, and simulated experimental results.
 
-## Dataset
+## Dataset and evaluation design
 
-The corrected pipeline generates **5,000 synthetic users** and session-level activity records. The latest run generated **92,072 session events**. User records include lifecycle, plan, acquisition, and behavioral attributes used in the funnel, cohort, engagement, and predictive analyses.
+The corrected pipeline generates **5,000 synthetic users** and session-level activity records. The latest reported run generated **92,072 session events**. User records include lifecycle, plan, acquisition, and behavioral attributes used in the funnel, cohort, engagement, and predictive analyses.
 
 The project also generates an **independent simulated randomized experiment** with 1,251 observations per arm. Those experiment records are separate from the 5,000-user lifecycle dataset and use stipulated weekly retention probabilities.
 
@@ -88,7 +88,7 @@ The test ROC-AUC of **0.567** is weak. Model coefficients describe associations 
 
 ## Interactive dashboard
 
-The dashboard source is available in [`shiny/app.R`](shiny/app.R). It contains five main sections, with two sub-tabs in Funnel Analysis, Retention & Engagement, and Predictive Model.
+The dashboard source is available in [`shiny/app.R`](shiny/app.R). It contains **five main navigation sections**, with two sub-tabs under Funnel Analysis, Retention & Engagement, and Predictive Model.
 
 ### Dashboard sections
 
@@ -150,7 +150,7 @@ The original implementation is retained at the repository root for historical re
 
 ## Reproducing the corrected analysis
 
-Run commands from the repository root in a clean R session. The scripts should be executed in order because later steps use data and outputs generated earlier.
+Run commands from the repository root in a clean R session. Execute the scripts in order because later steps use data and outputs generated earlier.
 
 ```r
 # Install required packages if needed
