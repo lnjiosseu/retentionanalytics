@@ -6,15 +6,15 @@ An end-to-end R portfolio project demonstrating product analytics workflows usin
 
 ## Dashboard
 
-The interactive Shiny dashboard is organized into five sections:
+The interactive Shiny dashboard is organized into five sections. Funnel Analysis and Retention & Engagement each contain two focused sub-tabs:
 
 1. **Executive Overview:** headline product metrics, conversion funnel, and overall retention curve.
-2. **Funnel Analysis:** sequential funnel performance, channel and plan comparisons, drop-off ranking, and a clearly labeled mechanical activation scenario.
-3. **Retention & Engagement:** retention by plan and user segment, month-6 retention by signup cohort, DAU/MAU, session engagement, and daily active users.
+2. **Funnel Analysis:** *Funnel Performance* covers the overall funnel, acquisition-channel conversion, and plan comparisons. *Drop-off & Scenarios* covers step-level drop-off and a clearly labeled mechanical activation projection.
+3. **Retention & Engagement:** *Retention & Cohorts* covers retention curves by plan and user segment plus month-6 cohort comparisons. *Product Engagement* covers DAU/MAU, session engagement, and daily active users.
 4. **Predictive Model:** held-out test metrics and logistic-regression coefficients.
 5. **Experimentation:** results from an independent simulated randomized experiment, period-specific tests, and explicit simulation assumptions.
 
-Dashboard screenshots should be captured from the corrected app after running the reproduction steps below and saved in `docs/screenshots/`. Recommended captures: executive overview, funnel analysis, retention and engagement, predictive model, and experimentation.
+Dashboard screenshots should be captured from the corrected app after running the reproduction steps below and saved in `docs/screenshots/`. Recommended captures: executive overview, both Funnel Analysis sub-tabs, both Retention & Engagement sub-tabs, predictive model, and experimentation.
 
 ## Current corrected results
 
@@ -31,7 +31,7 @@ The corrected pipeline uses 5,000 synthetic users. The latest run reported 92,07
 
 The model's displayed held-out metrics are precision 0.406, recall 0.329, specificity 0.781, and accuracy 0.639 at a threshold selected on validation data. These are baseline results, not evidence of a production-ready churn or retention model.
 
-The simulated experiment uses 1,251 observations per arm. The observed treatment-minus-control difference is 5.116 percentage points in weeks 1-2 (reported one-sided p-value rounds to 0.000 in the output) and 1.199 percentage points in weeks 3-4 (one-sided p-value 0.143). The weekly probabilities are stipulated simulation inputs. The early/late comparison illustrates a decaying simulated treatment effect; it is not an empirical novelty-effect finding.
+The simulated experiment uses 1,251 observations per arm. The observed treatment-minus-control difference is 5.116 percentage points in weeks 1-2 (one-sided p-value <0.001) and 1.199 percentage points in weeks 3-4 (one-sided p-value 0.143). The weekly probabilities are stipulated simulation inputs. The early/late comparison illustrates a decaying simulated treatment effect; it is not an empirical novelty-effect finding.
 
 ## What the project demonstrates
 
