@@ -104,9 +104,8 @@ for (i in seq_len(N_USERS)) {
   for (m in seq_along(base_curve)) {
     if (users[[paste0("active_month_", m)]][i] == 0L) next
 
-    month_start <- as.Date(format(users$cohort_month[i], "%Y-%m-01")) %m+%
-      months(m - 1L)
-    month_end <- month_start %m+% months(1L) - days(1L)
+    month_start <- seq(users$cohort_month[i], by = "month", length.out = 12)[m]
+    month_end <- seq(month_start, by = "month", length.out = 2)[2] - 1
     dates <- seq(month_start, month_end, by = "day")
 
     # Active users have a daily visit probability; power users visit more often.
