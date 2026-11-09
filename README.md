@@ -6,15 +6,15 @@ An end-to-end R portfolio project demonstrating product analytics workflows usin
 
 ## Dashboard
 
-The interactive Shiny dashboard is organized into five sections. Funnel Analysis and Retention & Engagement each contain two focused sub-tabs:
+The interactive Shiny dashboard is organized into five sections. Funnel Analysis, Retention & Engagement, and Predictive Model each contain two focused sub-tabs. Executive Overview and Experimentation remain single-page sections:
 
 1. **Executive Overview:** headline product metrics, conversion funnel, and overall retention curve.
 2. **Funnel Analysis:** *Funnel Performance* covers the overall funnel, acquisition-channel conversion, and plan comparisons. *Drop-off & Scenarios* covers step-level drop-off and a clearly labeled mechanical activation projection.
 3. **Retention & Engagement:** *Retention & Cohorts* covers retention curves by plan and user segment plus month-6 cohort comparisons. *Product Engagement* covers DAU/MAU, session engagement, and daily active users.
-4. **Predictive Model:** held-out test metrics and logistic-regression coefficients.
-5. **Experimentation:** results from an independent simulated randomized experiment, period-specific tests, and explicit simulation assumptions.
+4. **Predictive Model:** *Model Performance* presents held-out test metrics and interpretation. *Feature Associations & Interpretation* presents logistic-regression coefficients with guidance on their log-odds scale.
+5. **Experimentation:** results from an independent simulated randomized experiment, early-versus-later period tests, and explicit simulation assumptions.
 
-Dashboard screenshots should be captured from the corrected app after running the reproduction steps below and saved in `docs/screenshots/`. Recommended captures: executive overview, both Funnel Analysis sub-tabs, both Retention & Engagement sub-tabs, predictive model, and experimentation.
+Dashboard screenshots should be captured from the corrected app after running the reproduction steps below and saved in `docs/screenshots/`. Recommended captures: Executive Overview, both Funnel Analysis sub-tabs, both Retention & Engagement sub-tabs, both Predictive Model sub-tabs, and Experimentation. The screenshots are not yet included in this repository.
 
 ## Current corrected results
 
