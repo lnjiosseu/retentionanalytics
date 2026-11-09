@@ -165,12 +165,12 @@ server <- function(input, output, session) {
   })
   output$stickiness <- renderTable(d$dau_mau |>
     rename(Month = year_month, `Average DAU` = avg_dau, MAU = mau,
-           `DAU/MAU (%)` = avg_dau_mau_pct, `Days` = calendar_days), digits=1)
+           `DAU/MAU (%)` = avg_dau_mau_pct, `Days` = calendar_days), digits=c(1,0,1,0))
   output$engagement <- renderTable(d$engagement |>
     rename(Month = year_month, Sessions = sessions,
            `Avg. session (min)` = avg_session_length_min,
            `Actions/session` = avg_actions_per_session,
-           `Active users` = unique_active_users), digits=1)
+           `Active users` = unique_active_users), digits=c(0,1,1,0))
   output$dau <- renderPlot({
     ggplot(d$dau,aes(session_date,dau))+geom_line(color="#2878a5")+
       labs(x="Date",y="Daily active users")+theme_minimal()
