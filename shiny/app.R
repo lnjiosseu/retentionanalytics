@@ -122,7 +122,7 @@ server <- function(input, output, session) {
   })
   output$m6 <- renderPlot({
     cohort_plot <- d$m6 |>
-      mutate(cohort_month = as.Date(paste0(cohort_month, "-01")))
+      mutate(cohort_month = as.Date(paste0(substr(as.character(cohort_month), 1, 7), "-01")) )
     ggplot(cohort_plot,aes(cohort_month,m6_retention_pct))+
       geom_col(fill="#8064a2",width=24)+
       geom_text(aes(label=paste0(round(m6_retention_pct,1),"%\nn=",cohort_size)),
