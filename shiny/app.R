@@ -83,11 +83,26 @@ ui <- page_navbar(
     )
   ),
   nav_panel("Predictive Model",
-    layout_columns(
-      card(card_header("Model evaluation"), tableOutput("model")),
-      card(card_header("Model coefficients"), plotOutput("importance",height=360))
-    ),
-    p(class="text-muted","Logistic regression uses first-month features. The classification threshold is selected on validation data and evaluated once on the held-out test set. Coefficients are associations, not causal effects. The test ROC-AUC is a weak baseline result and should not be interpreted as production-ready predictive performance.")
+    navset_card_tab(
+      nav_panel("Model Performance",
+        layout_columns(
+          card(card_header("Held-out test performance"), tableOutput("model")),
+          card(card_header("How to read the results"),
+            h5("Weak baseline discrimination"),
+            p("The test ROC-AUC is 0.567. This indicates limited ability to rank users by future retention in this synthetic dataset."),
+            p("Precision and recall describe performance at the classification threshold selected using validation data. Accuracy should be interpreted cautiously because it can be misleading when outcome classes are imbalanced.")
+          )
+        ),
+        p(class="text-muted","The model uses first-month features. The classification threshold is selected on validation data and evaluated once on the untouched test set.")
+      ),
+      nav_panel("Feature Associations & Interpretation",
+        card(card_header("Logistic regression coefficients"),
+          p(class="text-muted","Positive coefficients are associated with higher modeled log-odds of retention; negative coefficients are associated with lower modeled log-odds. These are associations, not causal effects."),
+          plotOutput("importance",height=420)
+        ),
+        p(class="text-muted","Coefficient magnitudes are shown on the model's log-odds scale. They should not be interpreted as percentage-point changes in retention.")
+      )
+    )
   ),
   nav_panel("Experimentation",
     card(card_header("Simulated randomized experiment"), tableOutput("ab")),
@@ -178,11 +193,34 @@ server <- function(input, output, session) {
     ggplot(d$dau,aes(session_date,dau))+geom_line(color="#2878a5")+
       labs(x="Date",y="Daily active users")+theme_minimal()
   })
-  output$model <- renderTable(d$model,digits=3)
+  output$model <- renderTable({
+    d$model |>
+      mutate(value = case_when(
+        metric == "ROC-AUC" ~ sprintf("%.3f", as.numeric(value)),
+        metric == "Validation-selected threshold" ~ sprintf("%.3f", as.numeric(value)),
+        metric == "Test observations" ~ comma(as.numeric(value), accuracy=1),
+        TRUE ~ paste0(sprintf("%.1f", as.numeric(value) * 100), "%")
+      )) |>
+      rename(Metric = metric, Result = value)
+  }, striped=TRUE, bordered=FALSE, spacing="s")
   output$importance <- renderPlot({
-    ggplot(d$importance,aes(reorder(feature,coefficient),coefficient))+
-      geom_col(fill="#8064a2")+coord_flip()+
-      labs(x=NULL,y="Logistic regression coefficient")+theme_minimal()
+    feature_labels <- c(
+      is_paid = "Paid plan indicator",
+      completed_engagement = "Completed engagement",
+      is_trial = "Trial plan indicator",
+      is_desktop = "Desktop indicator",
+      is_referral = "Referral indicator",
+      completed_activation = "Completed activation",
+      completed_onboarding = "Completed onboarding"
+    )
+    importance_plot <- d$importance |>
+      mutate(feature_label = recode(feature, !!!as.list(feature_labels), .default=feature))
+    ggplot(importance_plot,aes(reorder(feature_label,coefficient),coefficient))+
+      geom_hline(yintercept=0,color="grey55",linewidth=.5)+
+      geom_col(fill="#8064a2",width=.7)+coord_flip()+
+      labs(x=NULL,y="Coefficient (log-odds scale)")+
+      theme_minimal()+
+      theme(panel.grid.minor=element_blank())
   })
   output$ab <- renderTable(d$ab,digits=1)
   output$abtests <- renderTable(d$ab_tests |>
