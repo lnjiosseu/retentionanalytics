@@ -2,7 +2,7 @@
 suppressPackageStartupMessages({
   library(shiny); library(bslib); library(tidyverse); library(scales)
 })
-root <- if (dir.exists("corrected_r/outputs")) "corrected_r/outputs" else if (dir.exists(file.path("..", "corrected_r", "outputs"))) file.path("..", "corrected_r", "outputs") else stop("Cannot find corrected_r/outputs. Run corrected scripts from the repository root first.")
+root <- if (dir.exists("corrected_r/outputs")) "corrected_r/outputs" else if (dir.exists(file.path("..", "corrected_r", "outputs"))) file.path("..", "corrected_r", "outputs") else stop("Cannot find corrected_r/outputs. Run the corrected scripts from the repository root first.")
 read_out <- function(file) read_csv(file.path(root, file), show_col_types = FALSE)
 d <- list(
   funnel = read_out("funnel_overall.csv"),
@@ -32,15 +32,15 @@ ui <- page_navbar(
   nav_panel("Executive Overview",
     layout_columns(
       value_box("Users", comma(5000), showcase = bsicons::bs_icon("people-fill")),
-      value_box("Signup-to-conversion", paste0(round(d$funnel$pct_of_signups[5],1),"%"),
+      value_box("Signup-to-conversion", paste0(round(d$funnel$pct_of_signups[d$funnel$step == "Conversion"],1),"%"),
                 showcase = bsicons::bs_icon("funnel")),
-      value_box("Month-6 retention", paste0(round(d$ret$retention_rate_pct[6],1),"%"),
+      value_box("Month-6 retention", paste0(round(d$ret$retention_rate_pct[d$ret$months_since_signup == 6],1),"%"),
                 showcase = bsicons::bs_icon("arrow-repeat")),
       value_box("Model ROC-AUC", round(as.numeric(d$model$value[d$model$metric=="ROC-AUC"]),3),
                 showcase = bsicons::bs_icon("graph-up"))
     ),
     layout_columns(
-      card(card_header("Conversion funnel"), plotOutput("funnel",height=300)),
+      card(card_header("Conversion funnel"), plotOutput("funnel_overview",height=300)),
       card(card_header("Retention curve"), plotOutput("retention",height=300))
     ),
     card(card_header("Interpretation and scope"),
@@ -48,7 +48,7 @@ ui <- page_navbar(
   ),
   nav_panel("Funnel Analysis",
     layout_columns(
-      card(card_header("Overall funnel"), plotOutput("funnel",height=330)),
+      card(card_header("Overall funnel"), plotOutput("funnel_detail",height=330)),
       card(card_header("Conversion by acquisition channel"), plotOutput("channel",height=330))
     ),
     card(card_header("Funnel by plan"), tableOutput("plan")),
@@ -60,7 +60,9 @@ ui <- page_navbar(
       card(card_header("Retention by plan"), plotOutput("retplan",height=320)),
       card(card_header("Power vs regular users"), plotOutput("retpower",height=320))
     ),
-    card(card_header("Month-6 retention by signup cohort"), plotOutput("m6",height=300)),
+    card(card_header("Month-6 retention by signup cohort"),
+      p(class="text-muted","Each bar represents one monthly signup cohort. Labels show month-6 retention and cohort size."),
+      plotOutput("m6",height=340)),
     layout_columns(
       card(card_header("DAU / MAU summary"), tableOutput("stickiness")),
       card(card_header("Session engagement"), tableOutput("engagement"))
@@ -72,7 +74,7 @@ ui <- page_navbar(
       card(card_header("Model evaluation"), tableOutput("model")),
       card(card_header("Model coefficients"), plotOutput("importance",height=360))
     ),
-    p(class="text-muted","Logistic regression uses first-month features. The classification threshold is selected on validation data and evaluated once on the held-out test set. Coefficients are associations, not causal effects.")
+    p(class="text-muted","Logistic regression uses first-month features. The classification threshold is selected on validation data and evaluated once on the held-out test set. Coefficients are associations, not causal effects. The test ROC-AUC is a weak baseline result and should not be interpreted as production-ready predictive performance.")
   ),
   nav_panel("Experimentation",
     card(card_header("Simulated randomized experiment"), tableOutput("ab")),
@@ -82,11 +84,15 @@ ui <- page_navbar(
   )
 )
 server <- function(input, output, session) {
-  output$funnel <- renderPlot({
+  funnel_plot <- function() {
     ggplot(d$funnel, aes(step, pct_of_signups)) +
-      geom_col(fill="#2878a5") + geom_text(aes(label=paste0(round(pct_of_signups,1),"%")),vjust=-.4) +
-      coord_cartesian(ylim=c(0,105)) + labs(x=NULL,y="% of signups") + theme_minimal()
-  })
+      geom_col(fill="#2878a5", width=.72) +
+      geom_text(aes(label=paste0(round(pct_of_signups,1),"%")), vjust=-.4, size=3.5) +
+      scale_y_continuous(limits=c(0,105), breaks=seq(0,100,25), labels=label_number(suffix="%")) +
+      labs(x=NULL,y="Share of signups") + theme_minimal()
+  }
+  output$funnel_overview <- renderPlot(funnel_plot())
+  output$funnel_detail <- renderPlot(funnel_plot())
   output$channel <- renderPlot({
     ggplot(d$channel,aes(reorder(acquisition_channel,conversion_pct),conversion_pct))+
       geom_col(fill="#27936f")+coord_flip()+labs(x=NULL,y="Conversion (%)")+theme_minimal()
@@ -97,22 +103,37 @@ server <- function(input, output, session) {
   output$retention <- renderPlot({
     ggplot(d$ret,aes(months_since_signup,retention_rate_pct))+
       geom_line(linewidth=1.1,color="#2878a5")+geom_point()+
-      labs(x="Months since signup",y="Retention (%)")+theme_minimal()
+      scale_y_continuous(limits=c(0,100), breaks=seq(0,100,20))+
+      labs(x="Months since signup",y="Retained users (%)")+theme_minimal()
   })
   output$retplan <- renderPlot({
     ggplot(d$ret_plan,aes(months_since_signup,retention_rate_pct,color=plan_type))+
-      geom_line(linewidth=1)+geom_point()+labs(x="Months since signup",y="Retention (%)",color="Plan")+
+      geom_line(linewidth=1)+geom_point()+
+      scale_y_continuous(limits=c(0,100), breaks=seq(0,100,20))+
+      labs(x="Months since signup",y="Retention (%)",color="Plan")+
       theme_minimal()
   })
   output$retpower <- renderPlot({
     ggplot(d$ret_power,aes(months_since_signup,retention_rate_pct,color=segment))+
-      geom_line(linewidth=1)+geom_point()+labs(x="Months since signup",y="Retention (%)",color=NULL)+
+      geom_line(linewidth=1)+geom_point()+
+      scale_y_continuous(limits=c(0,100), breaks=seq(0,100,20))+
+      labs(x="Months since signup",y="Retention (%)",color=NULL)+
       theme_minimal()
   })
   output$m6 <- renderPlot({
-    ggplot(d$m6,aes(cohort_month,m6_retention_pct))+
-      geom_col(fill="#8064a2")+labs(x="Signup cohort",y="Month-6 retention (%)")+
-      theme_minimal()+theme(axis.text.x=element_text(angle=35,hjust=1))
+    cohort_plot <- d$m6 |>
+      mutate(cohort_month = as.Date(paste0(cohort_month, "-01")))
+    ggplot(cohort_plot,aes(cohort_month,m6_retention_pct))+
+      geom_col(fill="#8064a2",width=24)+
+      geom_text(aes(label=paste0(round(m6_retention_pct,1),"%\nn=",cohort_size)),
+                vjust=-.25,size=3)+
+      scale_x_date(date_breaks="2 months",date_labels="%b %Y",
+                   expand=expansion(mult=c(.02,.04)))+
+      scale_y_continuous(limits=c(0,100),breaks=seq(0,100,20),
+                         labels=label_number(suffix="%"))+
+      labs(x="Signup cohort",y="Month-6 retention (%)")+
+      theme_minimal()+
+      theme(axis.text.x=element_text(angle=35,hjust=1))
   })
   output$stickiness <- renderTable(d$dau_mau,digits=1)
   output$engagement <- renderTable(d$engagement,digits=1)
