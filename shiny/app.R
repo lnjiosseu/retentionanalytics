@@ -47,27 +47,40 @@ ui <- page_navbar(
       p("All records are synthetic. Funnel scenarios are mechanical projections, not causal estimates. The A/B experiment is separately simulated and is not a live product experiment."))
   ),
   nav_panel("Funnel Analysis",
-    layout_columns(
-      card(card_header("Overall funnel"), plotOutput("funnel_detail",height=330)),
-      card(card_header("Conversion by acquisition channel"), plotOutput("channel",height=330))
-    ),
-    card(card_header("Funnel by plan"), tableOutput("plan")),
-    card(card_header("Drop-off ranking"), tableOutput("drop")),
-    card(card_header("Illustrative activation scenario"), tableOutput("projection"))
+    navset_card_tab(
+      nav_panel("Funnel Performance",
+        layout_columns(
+          card(card_header("Overall funnel"), plotOutput("funnel_detail",height=330)),
+          card(card_header("Conversion by acquisition channel"), plotOutput("channel",height=330))
+        ),
+        card(card_header("Funnel by plan"), tableOutput("plan"))
+      ),
+      nav_panel("Drop-off & Scenarios",
+        card(card_header("Drop-off ranking"), tableOutput("drop")),
+        card(card_header("Illustrative activation scenario"), tableOutput("projection")),
+        p(class="text-muted","The activation scenario is a mechanical projection that holds downstream conditional conversion rates constant. It is not a causal estimate.")
+      )
+    )
   ),
   nav_panel("Retention & Engagement",
-    layout_columns(
-      card(card_header("Retention by plan"), plotOutput("retplan",height=320)),
-      card(card_header("Power vs regular users"), plotOutput("retpower",height=320))
-    ),
-    card(card_header("Month-6 retention by signup cohort"),
-      p(class="text-muted","Each bar represents one monthly signup cohort. Labels show month-6 retention and cohort size."),
-      plotOutput("m6",height=340)),
-    layout_columns(
-      card(card_header("DAU / MAU summary"), tableOutput("stickiness")),
-      card(card_header("Session engagement"), tableOutput("engagement"))
-    ),
-    card(card_header("Daily active users"), plotOutput("dau",height=280))
+    navset_card_tab(
+      nav_panel("Retention & Cohorts",
+        layout_columns(
+          card(card_header("Retention by plan"), plotOutput("retplan",height=320)),
+          card(card_header("Power vs regular users"), plotOutput("retpower",height=320))
+        ),
+        card(card_header("Month-6 retention by signup cohort"),
+          p(class="text-muted","Each bar represents one monthly signup cohort. Labels show month-6 retention and cohort size."),
+          plotOutput("m6",height=380))
+      ),
+      nav_panel("Product Engagement",
+        layout_columns(
+          card(card_header("DAU / MAU summary"), tableOutput("stickiness")),
+          card(card_header("Session engagement"), tableOutput("engagement"))
+        ),
+        card(card_header("Daily active users"), plotOutput("dau",height=300))
+      )
+    )
   ),
   nav_panel("Predictive Model",
     layout_columns(
@@ -122,15 +135,19 @@ server <- function(input, output, session) {
   })
   output$m6 <- renderPlot({
     cohort_plot <- d$m6 |>
-      mutate(cohort_month = as.Date(paste0(substr(as.character(cohort_month), 1, 7), "-01")) )
-    ggplot(cohort_plot,aes(cohort_month,m6_retention_pct))+
-      geom_col(fill="#8064a2",width=24)+
-      geom_text(aes(label=paste0(round(m6_retention_pct,1),"%\nn=",cohort_size)),
+      mutate(
+        cohort_date = as.Date(cohort_month),
+        cohort_label = format(cohort_date, "%b %Y"),
+        cohort_label = factor(cohort_label, levels = unique(cohort_label))
+      )
+    ggplot(cohort_plot,aes(cohort_label,m6_retention_pct))+
+      geom_col(fill="#8064a2",width=.72)+
+      geom_text(aes(label=paste0(round(m6_retention_pct,1),"%\\nn=",cohort_size)),
                 vjust=-.25,size=3)+
-      scale_x_date(date_breaks="2 months",date_labels="%b %Y",
-                   expand=expansion(mult=c(.02,.04)))+
       scale_y_continuous(limits=c(0,100),breaks=seq(0,100,20),
-                         labels=label_number(suffix="%"))+
+                         labels=label_number(suffix="%"),
+                         expand=expansion(mult=c(0,.12)))+
+      scale_x_discrete(breaks=levels(cohort_plot$cohort_label)[seq(1,nlevels(cohort_plot$cohort_label),by=2)])+
       labs(x="Signup cohort",y="Month-6 retention (%)")+
       theme_minimal()+
       theme(axis.text.x=element_text(angle=35,hjust=1))
