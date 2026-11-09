@@ -105,17 +105,10 @@ ui <- page_navbar(
     )
   ),
   nav_panel("Experimentation",
-    navset_card_tab(
-      nav_panel("Experiment Results",
-        card(card_header("Simulated randomized experiment"), tableOutput("ab")),
-        card(card_header("Early vs. later period tests"), tableOutput("abtests")),
-        p(class="text-muted","Treatment effects are reported as percentage-point differences between treatment and control. The early-period difference is larger than the later-period difference; the later-period test does not meet the conventional 0.05 significance threshold.")
-      ),
-      nav_panel("Design & Assumptions",
-        card(card_header("Experiment design assumptions"), tableOutput("abassumptions")),
-        p(class="text-muted","This is an independent synthetic experiment, not an experiment conducted on observed users. Week-specific retention probabilities are stipulated simulation inputs. The early-to-late comparison illustrates a designed decay pattern, not an empirical novelty-effect finding.")
-      )
-    )
+    card(card_header("Simulated randomized experiment"), tableOutput("ab")),
+    card(card_header("Early vs. later period tests"), tableOutput("abtests")),
+    card(card_header("Experiment assumptions"), tableOutput("abassumptions")),
+    p(class="text-muted","This is an independent synthetic experiment, not an experiment conducted on observed users. Week-specific retention probabilities are stipulated simulation inputs. The early-to-late comparison illustrates a designed decay pattern, not an empirical novelty-effect finding.")
   )
 )
 server <- function(input, output, session) {
