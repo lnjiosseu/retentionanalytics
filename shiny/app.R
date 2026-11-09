@@ -28,7 +28,7 @@ ui <- page_navbar(
   title = "RetentionAnalytics | Product Analytics",
   theme = theme,
   header = tags$div(class="container-fluid text-muted py-2",
-    "Corrected R pipeline | Synthetic data | Predictive metrics evaluated on held-out test data"),
+    "Corrected R pipeline | Synthetic data | Held-out evaluation where applicable"),
   nav_panel("Executive Overview",
     layout_columns(
       value_box("Users", comma(5000), showcase = bsicons::bs_icon("people-fill")),
@@ -67,15 +67,15 @@ ui <- page_navbar(
       nav_panel("Retention & Cohorts",
         layout_columns(
           card(card_header("Retention by plan"), plotOutput("retplan",height=320)),
-          card(card_header("Power vs regular users"), plotOutput("retpower",height=320))
+          card(card_header("Power vs. regular users"), plotOutput("retpower",height=320))
         ),
-        card(card_header("Month-6 retention by signup cohort"),
+        card(card_header("Month 6 retention by signup cohort"),
           p(class="text-muted","Each bar represents one monthly signup cohort. Labels show month-6 retention and cohort size."),
           plotOutput("m6",height=380))
       ),
       nav_panel("Product Engagement",
         layout_columns(
-          card(card_header("DAU / MAU summary"), tableOutput("stickiness")),
+          card(card_header("DAU/MAU summary"), tableOutput("stickiness")),
           card(card_header("Session engagement"), tableOutput("engagement"))
         ),
         card(card_header("Daily active users"), plotOutput("dau",height=300))
