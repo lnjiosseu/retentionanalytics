@@ -105,10 +105,17 @@ ui <- page_navbar(
     )
   ),
   nav_panel("Experimentation",
-    card(card_header("Simulated randomized experiment"), tableOutput("ab")),
-    card(card_header("Early vs later period tests"), tableOutput("abtests")),
-    card(card_header("Experiment assumptions"), tableOutput("abassumptions")),
-    p(class="text-muted","This is an independent synthetic experiment. Week-specific retention probabilities are stipulated simulation inputs. The early-to-late comparison illustrates a decaying treatment effect, not an empirical novelty-effect finding.")
+    navset_card_tab(
+      nav_panel("Experiment Results",
+        card(card_header("Simulated randomized experiment"), tableOutput("ab")),
+        card(card_header("Early vs. later period tests"), tableOutput("abtests")),
+        p(class="text-muted","Treatment effects are reported as percentage-point differences between treatment and control. The early-period difference is larger than the later-period difference; the later-period test does not meet the conventional 0.05 significance threshold.")
+      ),
+      nav_panel("Design & Assumptions",
+        card(card_header("Experiment design assumptions"), tableOutput("abassumptions")),
+        p(class="text-muted","This is an independent synthetic experiment, not an experiment conducted on observed users. Week-specific retention probabilities are stipulated simulation inputs. The early-to-late comparison illustrates a designed decay pattern, not an empirical novelty-effect finding.")
+      )
+    )
   )
 )
 server <- function(input, output, session) {
@@ -222,13 +229,33 @@ server <- function(input, output, session) {
       theme_minimal()+
       theme(panel.grid.minor=element_blank())
   })
-  output$ab <- renderTable(d$ab,digits=1)
-  output$abtests <- renderTable(d$ab_tests |>
-    mutate(p_value_one_sided = if_else(p_value_one_sided < 0.001, "<0.001",
-                                       formatC(p_value_one_sided, format="f", digits=3))) |>
-    rename(Period = period, `Treatment effect (pp)` = treatment_minus_control_pp,
-           `One-sided p-value` = p_value_one_sided,
-           `N per arm` = n_per_arm), digits=3)
-  output$abassumptions <- renderTable(d$ab_assumptions)
+  output$ab <- renderTable({
+    d$ab |>
+      mutate(across(any_of(c("early_retention_pct", "late_retention_pct",
+                             "week1_pct", "week2_pct", "week3_pct", "week4_pct")),
+                    ~ paste0(sprintf("%.1f", as.numeric(.x)), "%")),
+             n = comma(as.numeric(n), accuracy=1)) |>
+      rename(Arm = arm, `Sample size` = n,
+             `Early retention` = early_retention_pct,
+             `Late retention` = late_retention_pct,
+             `Week 1` = week1_pct, `Week 2` = week2_pct,
+             `Week 3` = week3_pct, `Week 4` = week4_pct)
+  }, striped=TRUE, bordered=FALSE, spacing="s")
+  output$abtests <- renderTable({
+    d$ab_tests |>
+      mutate(
+        treatment_minus_control_pp = sprintf("%.2f", treatment_minus_control_pp),
+        p_value_one_sided = if_else(p_value_one_sided < 0.001, "<0.001",
+                                    formatC(p_value_one_sided, format="f", digits=3)),
+        n_per_arm = comma(as.numeric(n_per_arm), accuracy=1)
+      ) |>
+      rename(Period = period, `Treatment effect (percentage points)` = treatment_minus_control_pp,
+             `One-sided p-value` = p_value_one_sided,
+             `Sample size per arm` = n_per_arm)
+  }, striped=TRUE, bordered=FALSE, spacing="s")
+  output$abassumptions <- renderTable({
+    d$ab_assumptions |>
+      rename(Assumption = assumption, `Specified value` = value)
+  }, striped=TRUE, bordered=FALSE, spacing="s")
 }
 shinyApp(ui,server)
