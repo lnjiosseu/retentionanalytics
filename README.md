@@ -6,7 +6,7 @@ An end-to-end R portfolio project demonstrating product analytics workflows usin
 
 ## Dashboard
 
-The interactive Shiny dashboard is organized into five sections. Funnel Analysis, Retention & Engagement, and Predictive Model each contain two focused sub-tabs. Executive Overview and Experimentation remain single-page sections:
+The interactive Shiny dashboard is organized into five sections:
 
 1. **Executive Overview:** headline product metrics, conversion funnel, and overall retention curve.
 2. **Funnel Analysis:** *Funnel Performance* covers the overall funnel, acquisition-channel conversion, and plan comparisons. *Drop-off & Scenarios* covers step-level drop-off and a clearly labeled mechanical activation projection.
@@ -14,7 +14,21 @@ The interactive Shiny dashboard is organized into five sections. Funnel Analysis
 4. **Predictive Model:** *Model Performance* presents held-out test metrics and interpretation. *Feature Associations & Interpretation* presents logistic-regression coefficients with guidance on their log-odds scale.
 5. **Experimentation:** results from an independent simulated randomized experiment, early-versus-later period tests, and explicit simulation assumptions.
 
-Dashboard screenshots should be captured from the corrected app after running the reproduction steps below and saved in `docs/screenshots/`. Recommended captures: Executive Overview, both Funnel Analysis sub-tabs, both Retention & Engagement sub-tabs, both Predictive Model sub-tabs, and Experimentation. The screenshots are not yet included in this repository.
+### Dashboard gallery
+
+Screenshots are provided below to make the dashboard reviewable without running the app.
+
+| Dashboard section | Screenshot |
+|---|---|
+| Executive Overview | ![Executive Overview](docs/screenshots/01-executive-overview.png) |
+| Funnel Analysis - Funnel Performance | ![Funnel Performance](docs/screenshots/02-funnel-performance.png) |
+| Funnel Analysis - Drop-off & Scenarios | ![Drop-off and Scenarios](docs/screenshots/03-funnel-dropoff-scenarios.png) |
+| Retention & Engagement - Retention & Cohorts | ![Retention and Cohorts](docs/screenshots/04-retention-cohorts.png) |
+| Retention & Engagement - Product Engagement | ![Product Engagement](docs/screenshots/05-product-engagement.png) |
+| Predictive Model - Model Performance | ![Model Performance](docs/screenshots/06-model-performance.png) |
+| Predictive Model - Feature Associations | ![Feature Associations](docs/screenshots/07-feature-associations.png) |
+| Experimentation | ![Experimentation](docs/screenshots/08-experimentation.png) |
+
 
 ## Current corrected results
 
