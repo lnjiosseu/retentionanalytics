@@ -1,4 +1,4 @@
-# RetentionAnalytics. Product Retention, Funnel & Experimentation Analytics
+# RetentionAnalytics - Product Retention, Funnel & Experimentation Analytics
 
 RetentionAnalytics is an end-to-end **R portfolio project** exploring acquisition funnels, product activation, lifecycle retention, engagement, baseline retention prediction, and experimentation using simulated product data. It combines cohort analysis, product metrics, statistical modeling, and an interactive Shiny dashboard with a reproducible Quarto report.
 
