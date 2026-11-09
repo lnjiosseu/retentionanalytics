@@ -164,13 +164,16 @@ server <- function(input, output, session) {
       theme(axis.text.x=element_text(angle=35,hjust=1))
   })
   output$stickiness <- renderTable(d$dau_mau |>
-    rename(Month = year_month, `Average DAU` = avg_dau, MAU = mau,
-           `DAU/MAU (%)` = avg_dau_mau_pct, `Days` = calendar_days), digits=c(1,0,1,0))
+    mutate(MAU = format(round(mau), big.mark=",", scientific=FALSE, trim=TRUE),
+           Days = format(round(calendar_days), big.mark=",", scientific=FALSE, trim=TRUE)) |>
+    select(Month = year_month, `Average DAU` = avg_dau, MAU,
+           `DAU/MAU (%)` = avg_dau_mau_pct, Days), digits=2)
   output$engagement <- renderTable(d$engagement |>
-    rename(Month = year_month, Sessions = sessions,
+    mutate(Sessions = format(round(sessions), big.mark=",", scientific=FALSE, trim=TRUE),
+           `Active users` = format(round(unique_active_users), big.mark=",", scientific=FALSE, trim=TRUE)) |>
+    select(Month = year_month, Sessions,
            `Avg. session (min)` = avg_session_length_min,
-           `Actions/session` = avg_actions_per_session,
-           `Active users` = unique_active_users), digits=c(0,1,1,0))
+           `Actions/session` = avg_actions_per_session, `Active users`), digits=2)
   output$dau <- renderPlot({
     ggplot(d$dau,aes(session_date,dau))+geom_line(color="#2878a5")+
       labs(x="Date",y="Daily active users")+theme_minimal()
