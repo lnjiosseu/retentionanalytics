@@ -115,4 +115,4 @@ The scripts write generated data to `corrected_r/data/` and analysis outputs to 
 
 ## Author
 
-Ludovic Njiosseu | MS Statistics, NYU | Statistician and Data Scientist
+Ludovic Njiosseu | MPH (Biostatistics), NYU | Statistician and Data Scientist
