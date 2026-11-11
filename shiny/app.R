@@ -6,6 +6,9 @@ library(shiny)
 library(bslib)
 library(tidyverse)
 
+# Historical dashboard: reads original main-branch outputs only. It does not display
+# the later Nov. 9 PDF analysis or corrected_r outputs. See README.md.
+
 load_data <- function() {
   list(
     users         = read_csv("../data/users.csv",                          show_col_types = FALSE),
@@ -33,7 +36,7 @@ PAL <- list(high = "#e74c3c", med = "#f39c12", low = "#27ae60",
             blue = "#2980b9", purple = "#8e44ad", dark = "#2c3e50")
 
 ui <- page_navbar(
-  title = "RetentionAnalytics — Product Analytics Dashboard",
+  title = "RetentionAnalytics | Historical Original Baseline Dashboard",
   theme = bs_theme(bootswatch = "flatly", primary = PAL$dark),
 
   # ── Tab 1: Funnel ──────────────────────────────────────────────────────────
