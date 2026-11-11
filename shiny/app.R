@@ -113,7 +113,7 @@ ui <- page_navbar(
 )
 server <- function(input, output, session) {
   funnel_plot <- function() {
-    ggplot(d$funnel, aes(step, pct_of_signups)) +
+    ggplot(d$funnel |> mutate(step = factor(step, levels = c("Signup", "Onboarding", "Activation", "Engagement", "Conversion"))), aes(step, pct_of_signups)) +
       geom_col(fill="#2878a5", width=.72) +
       geom_text(aes(label=paste0(round(pct_of_signups,1),"%")), vjust=-.4, size=3.5) +
       scale_y_continuous(limits=c(0,105), breaks=seq(0,100,25), labels=label_number(suffix="%")) +
