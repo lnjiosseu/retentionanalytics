@@ -26,6 +26,10 @@ retention <- read_csv(file.path(out, "retention_curve_overall.csv"), show_col_ty
 model <- read_csv(file.path(out, "retention_model_metrics.csv"), show_col_types = FALSE)
 ab <- read_csv(file.path(out, "ab_experiment_summary.csv"), show_col_types = FALSE)
 ab_tests <- read_csv(file.path(out, "ab_period_tests.csv"), show_col_types = FALSE)
+
+# Preserve the sequential product funnel order in both the table and chart.
+funnel <- funnel |>
+  mutate(step = factor(step, levels = c("Signup", "Onboarding", "Activation", "Engagement", "Conversion")))
 ```
 
 ## Conversion funnel
