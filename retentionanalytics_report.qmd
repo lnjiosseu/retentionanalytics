@@ -1,6 +1,6 @@
 ---
 title: "RetentionAnalytics: Product Retention & Funnel Analysis"
-author: "Ludovic Njiosseu, MS (Statistics), NYU"
+author: "Ludovic Njiosseu, MPH (Biostatistics), NYU"
 date: today
 format:
   html:
