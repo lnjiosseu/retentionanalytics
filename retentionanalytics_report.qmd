@@ -1,196 +1,83 @@
 ---
 title: "RetentionAnalytics: User Retention & Funnel Analytics"
-author: "Ludovic Njiosseu, MS Biostatistics"
+author: "Ludovic Njiosseu, MPH Biostatistics"
 date: today
 format:
   html:
     toc: true
-    toc-depth: 3
-    code-fold: true
+    toc-depth: 2
     theme: flatly
-    embed-resources: true
 execute:
   warning: false
   message: false
 ---
 
-## Overview
+## Scope
 
-This project replicates large-scale consumer product analytics: conversion funnel analysis, cohort retention modeling, DAU/MAU tracking, predictive power-user identification, and A/B experimentation design — all in R on a simulated dataset of 5,000 users.
+This report describes a synthetic product-analytics exercise. It is not based on production customer data. The original committed scripts generate 5,000 synthetic users and 34,542 sessions. The original saved outputs report 12.62% signup-to-conversion, 31.96% overall M6 retention, approximately 27.9% DAU/MAU, and a retention-model ROC-AUC of 0.5946.
 
----
+## Provenance note
 
-## Module 1 — Data Simulation
+A separate PDF report dated Nov. 9, 2026 reports 92,072 sessions, 12.94% conversion, 31.26% M6 retention, and ROC-AUC 0.567. The exact data and complete generating pipeline for that run are not present in the current main-branch repository. Those are therefore document-reported values, not reproducible outputs from the code below. Do not combine those figures with the original saved baseline.
 
-```{r}
-source("scripts/01_simulate_data.R")
-```
+## Original baseline reproduction
 
-Users are generated across 12 monthly signup cohorts with acquisition channel, device type, plan type, and age group. Funnel completion is stochastic with plan-type-conditional pass-through rates. Monthly retention follows a decaying curve with a behavioral power-user boost.
-
----
-
-## Module 2 — Conversion Funnel
-
-```{r}
-source("scripts/02_funnel_analysis.R")
-library(tidyverse)
-```
-
-### Funnel Visualization
-
-```{r}
-funnel <- read_csv("outputs/funnel_overall.csv", show_col_types = FALSE)
-funnel %>%
-  mutate(step = fct_inorder(step)) %>%
-  ggplot(aes(x = step, y = pct_of_signup)) +
-  geom_col(fill = "#2980b9", alpha = 0.85) +
-  geom_text(aes(label = paste0(pct_of_signup, "%")), vjust = -0.4, size = 4) +
-  labs(title = "Conversion Funnel — % of Signups",
-       x = NULL, y = "% of Signups") +
-  theme_minimal()
-```
-
-### Top Drop-off Points
-
-```{r}
-dropoffs <- read_csv("outputs/funnel_dropoffs.csv", show_col_types = FALSE)
-knitr::kable(dropoffs, caption = "Funnel Drop-off by Step")
-```
-
-The three critical drop-off points are identified by step-over-step conversion loss. A +5pp intervention at the activation step is projected to produce measurable downstream conversion lift (see `outputs/funnel_improvement_projection.csv`).
-
-### Conversion by Acquisition Channel
-
-```{r}
-funnel_ch <- read_csv("outputs/funnel_by_channel.csv", show_col_types = FALSE)
-funnel_ch %>%
-  mutate(acquisition_channel = fct_reorder(acquisition_channel, pct_conversion)) %>%
-  ggplot(aes(x = acquisition_channel, y = pct_conversion, fill = pct_conversion)) +
-  geom_col() + coord_flip() +
-  scale_fill_gradient(low = "#27ae60", high = "#2980b9") +
-  labs(title = "Conversion Rate by Acquisition Channel",
-       x = NULL, y = "Conversion (%)") +
-  theme_minimal() + theme(legend.position = "none")
-```
-
----
-
-## Module 3 — Retention Cohorts & DAU/MAU
-
-```{r}
-source("scripts/03_retention_cohorts.R")
-```
-
-### Retention Curves by Plan Type
-
-```{r}
-ret_plan <- read_csv("outputs/retention_by_plan.csv", show_col_types = FALSE)
-ggplot(ret_plan, aes(x = months_since_signup, y = retention_rate,
-                     color = plan_type, group = plan_type)) +
-  geom_line(size = 1.2) + geom_point(size = 2) +
-  scale_color_manual(values = c(free = "#2980b9", trial = "#f39c12", paid = "#27ae60")) +
-  labs(title = "Monthly Retention by Plan Type",
-       x = "Months Since Signup", y = "Retention Rate (%)", color = "Plan") +
-  theme_minimal()
-```
-
-### Power User vs Regular Retention
-
-```{r}
-ret_power <- read_csv("outputs/retention_by_power.csv", show_col_types = FALSE)
-ggplot(ret_power, aes(x = months_since_signup, y = retention_rate,
-                       color = segment, group = segment)) +
-  geom_line(size = 1.2) + geom_point(size = 2) +
-  scale_color_manual(values = c("Power User" = "#8e44ad", "Regular User" = "#2980b9")) +
-  labs(title = "Power User vs Regular User Retention",
-       x = "Months Since Signup", y = "Retention Rate (%)", color = NULL) +
-  theme_minimal()
-```
-
-The power-user behavioral signature (high engagement completion, desktop device, referral channel) is associated with substantially higher long-term retention — validating the predictive model in Module 4.
-
-### Month-6 Retention by Signup Cohort
-
-```{r}
-m6 <- read_csv("outputs/m6_retention_by_cohort.csv", show_col_types = FALSE)
-m6 %>%
-  mutate(cohort_month = format(as.Date(cohort_month), "%b %Y")) %>%
-  ggplot(aes(x = cohort_month, y = m6_retention_rate)) +
-  geom_col(fill = "#8e44ad", alpha = 0.85) +
-  geom_text(aes(label = paste0(m6_retention_rate, "%")), vjust = -0.3, size = 3) +
-  labs(title = "Month-6 Retention by Signup Cohort",
-       x = "Cohort", y = "M6 Retention (%)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
-```
-
-### DAU / MAU Stickiness
-
-```{r}
-dau_mau <- read_csv("outputs/dau_mau_summary.csv", show_col_types = FALSE)
-knitr::kable(dau_mau, caption = "DAU/MAU Stickiness by Month")
-```
-
----
-
-## Module 4 — Predictive Model & Experimentation
-
-```{r}
-source("scripts/04_predictive_model.R")
-```
-
-### Power User Behavioral Signature
-
-```{r}
-feat_imp <- read_csv("outputs/power_user_feature_importance.csv", show_col_types = FALSE)
-feat_imp %>%
-  mutate(feature = fct_reorder(feature, abs(coefficient)),
-         direction = ifelse(coefficient > 0, "Increases Retention", "Decreases Retention")) %>%
-  ggplot(aes(x = feature, y = coefficient, fill = direction)) +
-  geom_col() + coord_flip() +
-  scale_fill_manual(values = c("Increases Retention" = "#27ae60",
-                               "Decreases Retention" = "#e74c3c")) +
-  labs(title = "Predictors of 6-Month Retention",
-       x = NULL, y = "Log-Odds Coefficient", fill = NULL) +
-  theme_minimal()
-```
-
-```{r}
-ret_metrics <- read_csv("outputs/retention_model_metrics.csv", show_col_types = FALSE)
-knitr::kable(ret_metrics, caption = "Retention Prediction Model Metrics")
-```
-
-### A/B Experiment Results
-
-```{r}
-ab_summary <- read_csv("outputs/ab_experiment_summary.csv", show_col_types = FALSE)
-knitr::kable(ab_summary, caption = "Onboarding A/B Experiment Summary")
-```
-
-The experimentation framework includes: hypothesis framing, power analysis (two-proportion z-test), metric selection (M1 retention as primary, conversion rate as guardrail), and novelty-effect correction by comparing early vs. stabilized weeks.
-
----
-
-## Reproducibility
+Run from the repository root:
 
 ```r
 install.packages(c("tidyverse", "pROC", "shiny", "bslib", "bsicons"))
-
 source("scripts/01_simulate_data.R")
 source("scripts/02_funnel_analysis.R")
 source("scripts/03_retention_cohorts.R")
 source("scripts/04_predictive_model.R")
-
-shiny::runApp("shiny/")
-quarto::quarto_render("retentionanalytics_report.qmd")
 ```
 
----
+The following chunks generate the original baseline outputs.
 
-## Limitations & Extensions
+```{r}
+source("scripts/01_simulate_data.R")
+source("scripts/02_funnel_analysis.R")
+source("scripts/03_retention_cohorts.R")
+source("scripts/04_predictive_model.R")
+```
 
-- Session data covers 3 months; production would use full lifecycle data.
-- The power user model is trained on first-month features; real systems use streaming behavioral signals updated daily.
-- No network/referral graph effects are modeled — relevant for virality-driven products.
-- Revenue metrics (LTV, ARPU) are not included but are the natural next layer.
+## Funnel
+
+```{r}
+library(tidyverse)
+funnel <- read_csv("outputs/funnel_overall.csv", show_col_types = FALSE)
+funnel |>
+  mutate(step = forcats::fct_inorder(step)) |>
+  ggplot(aes(step, pct_of_signup)) +
+  geom_col(fill = "#2878a8") +
+  labs(title = "Original simulated funnel", x = NULL, y = "% of signups") +
+  theme_minimal()
+```
+
+## Cohort retention
+
+```{r}
+m6 <- read_csv("outputs/m6_retention_by_cohort.csv", show_col_types = FALSE)
+knitr::kable(m6, caption = "Original baseline M6 retention by cohort")
+```
+
+## Model performance
+
+```{r}
+metrics <- read_csv("outputs/retention_model_metrics.csv", show_col_types = FALSE)
+knitr::kable(metrics, caption = "Original baseline retention-model metrics")
+```
+
+The saved baseline ROC-AUC is 0.5946. This indicates weak discrimination and should not be described as a strong or production-ready prediction model. The original A/B novelty comparison used arbitrary random offsets and is not reported here as an empirical effect.
+
+## Corrected analysis status
+
+The `audit/corrected-r-baseline` branch contains additional scripts for a complete daily DAU calendar, descriptive M6 segmentation, and a separate user-level randomized experiment simulation. It does not yet contain a complete replacement funnel and prediction pipeline, nor the full provenance for the Nov. 9 PDF dataset. See `corrected_r/README.md` on that branch before using those scripts.
+
+## Limitations
+
+- All records are synthetic.
+- Power-user segment differences are descriptive, not causal.
+- The original prediction model has weak discrimination.
+- The independent A/B simulation is a methodology demonstration, not a live product experiment.
+- The Nov. 9 PDF's alternate dataset and metrics are not reproducible from this repository snapshot.
