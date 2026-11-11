@@ -204,6 +204,6 @@ Key methodological choices include sequential funnel definitions, month-since-si
 
 ## Author
 
-**Ludovic Njiosseu** | MS in Statistics, NYU | Statistician and Data Scientist
+**Ludovic Njiosseu** | MPH (Biostatistics), NYU | Statistician and Data Scientist
 
 Portfolio focus: product analytics, statistical modeling, experimentation, and applied data science.
