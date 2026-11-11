@@ -105,12 +105,12 @@ The screenshots below allow the dashboard to be reviewed without running the app
 | Dashboard section | Screenshot |
 |---|---|
 | Executive Overview | ![Executive Overview](docs/screenshots/01-executive-overview.png) |
-| Funnel Analysis. Funnel Performance | ![Funnel Performance](docs/screenshots/02-funnel-performance.png) |
-| Funnel Analysis. Drop-off & Scenarios | ![Drop-off and Scenarios](docs/screenshots/03-funnel-dropoff-scenarios.png) |
-| Retention & Engagement. Retention & Cohorts | ![Retention and Cohorts](docs/screenshots/04-retention-cohorts.png) |
-| Retention & Engagement. Product Engagement | ![Product Engagement](docs/screenshots/05-product-engagement.png) |
-| Predictive Model. Model Performance | ![Model Performance](docs/screenshots/06-model-performance.png) |
-| Predictive Model. Feature Associations & Interpretation | ![Feature Associations](docs/screenshots/07-feature-associations.png) |
+| Funnel Analysis: Funnel Performance | ![Funnel Performance](docs/screenshots/02-funnel-performance.png) |
+| Funnel Analysis: Drop-off & Scenarios | ![Drop-off and Scenarios](docs/screenshots/03-funnel-dropoff-scenarios.png) |
+| Retention & Engagement: Retention & Cohorts | ![Retention and Cohorts](docs/screenshots/04-retention-cohorts.png) |
+| Retention & Engagement: Product Engagement | ![Product Engagement](docs/screenshots/05-product-engagement.png) |
+| Predictive Model: Model Performance | ![Model Performance](docs/screenshots/06-model-performance.png) |
+| Predictive Model: Feature Associations & Interpretation | ![Feature Associations](docs/screenshots/07-feature-associations.png) |
 | Experimentation | ![Experimentation](docs/screenshots/08-experimentation.png) |
 
 ## Quarto analytical report
