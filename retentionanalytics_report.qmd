@@ -1,196 +1,71 @@
 ---
-title: "RetentionAnalytics: User Retention & Funnel Analytics"
-author: "Ludovic Njiosseu, MS Biostatistics"
-date: today
+title: "RetentionAnalytics: Product Retention & Funnel Analysis"
+author: "Ludovic Njiosseu, MPH in Biostatistics"
+date: "2026-11-09"
 format:
   html:
     toc: true
-    toc-depth: 3
-    code-fold: true
+    toc-depth: 2
     theme: flatly
-    embed-resources: true
-execute:
-  warning: false
-  message: false
 ---
 
-## Overview
+## Scope and data
 
-This project replicates large-scale consumer product analytics: conversion funnel analysis, cohort retention modeling, DAU/MAU tracking, predictive power-user identification, and A/B experimentation design — all in R on a simulated dataset of 5,000 users.
+This report summarizes the November 9, 2026 analysis snapshot for a synthetic product dataset of 5,000 users across 12 signup cohorts. It is not real customer data.
 
----
+**Provenance note:** The original saved outputs and this report disagree on session volume, conversion, month-6 retention, and model AUC. The corrected branch contains focused methodological scripts, but not a complete committed pipeline that regenerates every value below. Values are therefore identified as report-reported results, not independently reproduced outputs.
 
-## Module 1 — Data Simulation
+## Conversion funnel
 
-```{r}
-source("scripts/01_simulate_data.R")
-```
+| Stage | Users | Share of signups |
+|---|---:|---:|
+| Signup | 5,000 | 100.00% |
+| Onboarding | 3,874 | 77.48% |
+| Activation | 2,407 | 48.14% |
+| Engagement | 1,387 | 27.74% |
+| Conversion | 647 | 12.94% |
 
-Users are generated across 12 monthly signup cohorts with acquisition channel, device type, plan type, and age group. Funnel completion is stochastic with plan-type-conditional pass-through rates. Monthly retention follows a decaying curve with a behavioral power-user boost.
+The largest absolute loss occurs between signup and onboarding (1,126 users); activation is also a substantial drop-off. Funnel percentages are calculated against the signup population in the report.
 
----
+## Cohort retention and engagement
 
-## Module 2 — Conversion Funnel
+The report-reported month-6 retention is 1,563 of 5,000 users (31.26%). This is a descriptive result from the synthetic dataset. A higher retention rate among a behaviorally defined segment would not, by itself, establish that the segment definition or its behaviors caused retention.
 
-```{r}
-source("scripts/02_funnel_analysis.R")
-library(tidyverse)
-```
+## Predictive baseline
 
-### Funnel Visualization
+The report describes a logistic-regression model using first-month features, evaluated on 1,001 test users.
 
-```{r}
-funnel <- read_csv("outputs/funnel_overall.csv", show_col_types = FALSE)
-funnel %>%
-  mutate(step = fct_inorder(step)) %>%
-  ggplot(aes(x = step, y = pct_of_signup)) +
-  geom_col(fill = "#2980b9", alpha = 0.85) +
-  geom_text(aes(label = paste0(pct_of_signup, "%")), vjust = -0.4, size = 4) +
-  labs(title = "Conversion Funnel — % of Signups",
-       x = NULL, y = "% of Signups") +
-  theme_minimal()
-```
+| Metric | Value |
+|---|---:|
+| ROC-AUC | 0.567 |
+| Precision | 0.406 |
+| Recall | 0.329 |
+| Specificity | 0.781 |
+| Accuracy | 0.639 |
+| Threshold | 0.346 |
 
-### Top Drop-off Points
+The ROC-AUC indicates weak ranking discrimination. The model is a baseline demonstration and should not be presented as a high-performing retention model.
 
-```{r}
-dropoffs <- read_csv("outputs/funnel_dropoffs.csv", show_col_types = FALSE)
-knitr::kable(dropoffs, caption = "Funnel Drop-off by Step")
-```
+## Simulated onboarding experiment
 
-The three critical drop-off points are identified by step-over-step conversion loss. A +5pp intervention at the activation step is projected to produce measurable downstream conversion lift (see `outputs/funnel_improvement_projection.csv`).
+The experiment is separate from the 5,000-user product simulation and has 1,251 simulated users per arm.
 
-### Conversion by Acquisition Channel
+| Period | Treatment-control difference | One-sided p-value |
+|---|---:|---:|
+| Weeks 1-2 | +5.116 percentage points | <0.001 |
+| Weeks 3-4 | +1.199 percentage points | 0.143 |
 
-```{r}
-funnel_ch <- read_csv("outputs/funnel_by_channel.csv", show_col_types = FALSE)
-funnel_ch %>%
-  mutate(acquisition_channel = fct_reorder(acquisition_channel, pct_conversion)) %>%
-  ggplot(aes(x = acquisition_channel, y = pct_conversion, fill = pct_conversion)) +
-  geom_col() + coord_flip() +
-  scale_fill_gradient(low = "#27ae60", high = "#2980b9") +
-  labs(title = "Conversion Rate by Acquisition Channel",
-       x = NULL, y = "Conversion (%)") +
-  theme_minimal() + theme(legend.position = "none")
-```
+The experiment generates outcomes from assumed probabilities. These figures demonstrate a statistical testing workflow; they are not observed product outcomes or evidence of a real intervention effect. The early-versus-late difference should not be described as an empirically established novelty effect.
 
----
+## Limitations
 
-## Module 3 — Retention Cohorts & DAU/MAU
+- Synthetic data only. Results do not establish performance on a real consumer product.
+- The current committed corrected scripts do not regenerate the full report snapshot end to end.
+- Earlier saved outputs differ from this report on session volume, conversion, month-6 retention, and ROC-AUC.
+- The prediction model has modest discrimination.
+- The A/B exercise is a separate simulation with assumed probabilities, not a live or historical randomized experiment.
+- DAU/MAU and cohort summaries depend on the synthetic observation-window construction.
 
-```{r}
-source("scripts/03_retention_cohorts.R")
-```
+## Reproducibility status
 
-### Retention Curves by Plan Type
-
-```{r}
-ret_plan <- read_csv("outputs/retention_by_plan.csv", show_col_types = FALSE)
-ggplot(ret_plan, aes(x = months_since_signup, y = retention_rate,
-                     color = plan_type, group = plan_type)) +
-  geom_line(size = 1.2) + geom_point(size = 2) +
-  scale_color_manual(values = c(free = "#2980b9", trial = "#f39c12", paid = "#27ae60")) +
-  labs(title = "Monthly Retention by Plan Type",
-       x = "Months Since Signup", y = "Retention Rate (%)", color = "Plan") +
-  theme_minimal()
-```
-
-### Power User vs Regular Retention
-
-```{r}
-ret_power <- read_csv("outputs/retention_by_power.csv", show_col_types = FALSE)
-ggplot(ret_power, aes(x = months_since_signup, y = retention_rate,
-                       color = segment, group = segment)) +
-  geom_line(size = 1.2) + geom_point(size = 2) +
-  scale_color_manual(values = c("Power User" = "#8e44ad", "Regular User" = "#2980b9")) +
-  labs(title = "Power User vs Regular User Retention",
-       x = "Months Since Signup", y = "Retention Rate (%)", color = NULL) +
-  theme_minimal()
-```
-
-The power-user behavioral signature (high engagement completion, desktop device, referral channel) is associated with substantially higher long-term retention — validating the predictive model in Module 4.
-
-### Month-6 Retention by Signup Cohort
-
-```{r}
-m6 <- read_csv("outputs/m6_retention_by_cohort.csv", show_col_types = FALSE)
-m6 %>%
-  mutate(cohort_month = format(as.Date(cohort_month), "%b %Y")) %>%
-  ggplot(aes(x = cohort_month, y = m6_retention_rate)) +
-  geom_col(fill = "#8e44ad", alpha = 0.85) +
-  geom_text(aes(label = paste0(m6_retention_rate, "%")), vjust = -0.3, size = 3) +
-  labs(title = "Month-6 Retention by Signup Cohort",
-       x = "Cohort", y = "M6 Retention (%)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
-```
-
-### DAU / MAU Stickiness
-
-```{r}
-dau_mau <- read_csv("outputs/dau_mau_summary.csv", show_col_types = FALSE)
-knitr::kable(dau_mau, caption = "DAU/MAU Stickiness by Month")
-```
-
----
-
-## Module 4 — Predictive Model & Experimentation
-
-```{r}
-source("scripts/04_predictive_model.R")
-```
-
-### Power User Behavioral Signature
-
-```{r}
-feat_imp <- read_csv("outputs/power_user_feature_importance.csv", show_col_types = FALSE)
-feat_imp %>%
-  mutate(feature = fct_reorder(feature, abs(coefficient)),
-         direction = ifelse(coefficient > 0, "Increases Retention", "Decreases Retention")) %>%
-  ggplot(aes(x = feature, y = coefficient, fill = direction)) +
-  geom_col() + coord_flip() +
-  scale_fill_manual(values = c("Increases Retention" = "#27ae60",
-                               "Decreases Retention" = "#e74c3c")) +
-  labs(title = "Predictors of 6-Month Retention",
-       x = NULL, y = "Log-Odds Coefficient", fill = NULL) +
-  theme_minimal()
-```
-
-```{r}
-ret_metrics <- read_csv("outputs/retention_model_metrics.csv", show_col_types = FALSE)
-knitr::kable(ret_metrics, caption = "Retention Prediction Model Metrics")
-```
-
-### A/B Experiment Results
-
-```{r}
-ab_summary <- read_csv("outputs/ab_experiment_summary.csv", show_col_types = FALSE)
-knitr::kable(ab_summary, caption = "Onboarding A/B Experiment Summary")
-```
-
-The experimentation framework includes: hypothesis framing, power analysis (two-proportion z-test), metric selection (M1 retention as primary, conversion rate as guardrail), and novelty-effect correction by comparing early vs. stabilized weeks.
-
----
-
-## Reproducibility
-
-```r
-install.packages(c("tidyverse", "pROC", "shiny", "bslib", "bsicons"))
-
-source("scripts/01_simulate_data.R")
-source("scripts/02_funnel_analysis.R")
-source("scripts/03_retention_cohorts.R")
-source("scripts/04_predictive_model.R")
-
-shiny::runApp("shiny/")
-quarto::quarto_render("retentionanalytics_report.qmd")
-```
-
----
-
-## Limitations & Extensions
-
-- Session data covers 3 months; production would use full lifecycle data.
-- The power user model is trained on first-month features; real systems use streaming behavioral signals updated daily.
-- No network/referral graph effects are modeled — relevant for virality-driven products.
-- Revenue metrics (LTV, ARPU) are not included but are the natural next layer.
+The original scripts remain in `scripts/`; audited focused scripts remain in `corrected_r/scripts/`. See `corrected_r/README.md` for the scripts currently available and the safeguards they implement. Do not treat the report-reported figures as regenerated until a complete pipeline and its generated outputs are committed and checked.
