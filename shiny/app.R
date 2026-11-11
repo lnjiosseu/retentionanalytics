@@ -116,6 +116,7 @@ server <- function(input, output, session) {
     ggplot(d$funnel |> mutate(step = factor(step, levels = c("Signup", "Onboarding", "Activation", "Engagement", "Conversion"))), aes(step, pct_of_signups)) +
       geom_col(fill="#2878a5", width=.72) +
       geom_text(aes(label=paste0(round(pct_of_signups,1),"%")), vjust=-.4, size=3.5) +
+      scale_x_discrete(limits = c("Signup", "Onboarding", "Activation", "Engagement", "Conversion")) +
       scale_y_continuous(limits=c(0,105), breaks=seq(0,100,25), labels=label_number(suffix="%")) +
       labs(x=NULL,y="Share of signups") + theme_minimal()
   }
