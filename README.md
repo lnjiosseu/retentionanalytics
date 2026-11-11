@@ -1,123 +1,81 @@
-# RetentionAnalytics: User Retention & Funnel Analytics
+# RetentionAnalytics: Product Retention & Funnel Analysis
 
-A portfolio project replicating large-scale consumer product analytics workflows - built end-to-end in R, covering conversion funnel analysis, cohort retention modeling, DAU/MAU tracking, predictive power-user identification, and A/B experimentation design.
+A product analytics case study using synthetic user and session data. The project examines acquisition-to-conversion funnel performance, cohort retention, DAU/MAU engagement, a six-month retention classifier, and an illustrative onboarding experiment.
 
----
+## Data and scope
 
-## Why This Project Exists
+All records are synthetic. The November 9, 2026 analysis report describes 5,000 users across 12 signup cohorts. These results are not observations from a real product.
 
-Retention and funnel analytics are the operational backbone of product data science. Understanding where users drop out of the funnel, which cohorts retain best, what behaviors predict long-term engagement, and how to design rigorous experiments to test interventions - these are the core questions product teams and growth teams answer every day.
+## Reported analysis snapshot
 
-This project builds that entire stack from first principles in R, with outputs designed for both technical stakeholders (model metrics, statistical test results) and non-technical ones (Shiny dashboards, self-serve KPI tracking).
+The following figures are transcribed from the November 9, 2026 analytical report. They are report-reported results, not a claim that the currently committed scripts regenerate every figure.
 
----
+### Funnel
 
-## What It Does
+| Stage | Users | Share of signups |
+|---|---:|---:|
+| Signup | 5,000 | 100.00% |
+| Onboarding | 3,874 | 77.48% |
+| Activation | 2,407 | 48.14% |
+| Engagement | 1,387 | 27.74% |
+| Conversion | 647 | 12.94% |
 
-**Module 1 - Data Simulation**
-- 5,000 users across 12 monthly signup cohorts
-- Acquisition channels, device types, plan types, and behavioral features
-- Stochastic funnel completion and monthly retention with power-user boost
+### Retention and engagement
 
-**Module 2 - Conversion Funnel**
-- End-to-end funnel: signup → onboarding → activation → engagement → conversion
-- Step-over-step drop-off identification - 3 critical intervention points flagged
-- Conversion segmented by plan type and acquisition channel
-- Projected activation lift scenario modeled downstream
+- Month-6 retention: 1,563 / 5,000 (31.26%).
+- The report includes daily and monthly active-user summaries. Interpret DAU/MAU as engagement measures for the simulated observation window, not a generalizable product benchmark.
 
-**Module 3 - Retention Cohorts & DAU/MAU**
-- Monthly retention curves by plan type and power-user segment
-- Month-6 retention by signup cohort (north star metric)
-- DAU/MAU stickiness ratio computed and trended over 3 months
-- Session engagement metrics (session length, actions per session)
+### Retention prediction
 
-**Module 4 - Predictive Model & Experimentation**
-- Logistic regression model predicting 6-month retention from first-month signals
-- Power user behavioral signature extracted from feature importance
-- Full A/B testing framework: hypothesis definition, power analysis, metric selection, novelty-effect correction, guardrail metric evaluation
+The report describes a logistic-regression model using first-month features and a held-out test set of 1,001 users.
 
-**Deliverables**
-- Interactive Shiny dashboard (4 tabs: Funnel, Retention, DAU/MAU, Prediction & Experimentation)
-- Quarto HTML report with reproducible code, figures, and tables
+| Metric | Reported value |
+|---|---:|
+| ROC-AUC | 0.567 |
+| Precision | 0.406 |
+| Recall | 0.329 |
+| Specificity | 0.781 |
+| Accuracy | 0.639 |
+| Classification threshold | 0.346 |
 
----
+The discrimination is modest. The model should be treated as a baseline, not as a strong production predictor.
 
-## Key Results
+### Illustrative onboarding experiment
 
-| Finding | Value |
-|---|---|
-| Conversion rate (signup → conversion) | ~12% overall; ~35% for trial users |
-| Top drop-off step | Onboarding → Activation |
-| Projected lift from activation fix (+5pp) | ~12% downstream conversion lift |
-| Power user M6 retention premium | ~18pp above regular users |
-| Retention prediction AUC-ROC | ~0.81 |
-| A/B experiment: onboarding lift | +5pp M1 retention (statistically significant) |
+The report describes a separate simulated experiment with 1,251 users per arm. The reported early-period treatment-control difference was +5.116 percentage points (one-sided p < 0.001); the later-period difference was +1.199 percentage points (one-sided p = 0.143). This is a simulation under assumed outcome probabilities, not a real randomized product experiment. The early/late contrast is not evidence of a measured causal novelty effect in production.
 
----
+## Reproducibility and provenance
 
-## Methods
+The repository retains the original analysis in `scripts/` and the audited baseline work in `corrected_r/`. The original saved outputs and the November 9 report do not agree on several quantities, including session volume, conversion, month-6 retention, and model AUC. The corrected branch currently contains focused methodological scripts, but not a complete end-to-end pipeline that regenerates every table in the November 9 report.
 
-| Component | Method |
-|---|---|
-| Funnel analysis | Step-over-step conversion rates, drop-off identification |
-| Retention modeling | Monthly cohort retention matrix |
-| DAU/MAU | Rolling distinct user counts by day/month |
-| Power user prediction | Logistic regression on first-month behavioral features |
-| Threshold selection | Youden's J |
-| A/B power analysis | Two-proportion z-test |
-| Novelty correction | Week 1–2 vs Week 3–4 lift comparison |
-| Visualization | ggplot2, Shiny, bslib |
+For that reason:
+- The November 9 report is treated as the current **reported snapshot** for this branch.
+- The historical original outputs are not silently substituted for the report values.
+- No claim is made that the report snapshot is fully reproducible from the committed scripts today.
+- The A/B simulation is kept separate from the 5,000-user observational simulation.
+- No causal claim is made from the power-user/regular-user retention contrast.
 
----
+See [corrected_r/README.md](corrected_r/README.md) for the audited script inventory and limitations.
 
-## Project Structure
+## Project structure
 
 ```
 retentionanalytics/
-├── scripts/
-│   ├── 01_simulate_data.R        # User + session dataset generation
-│   ├── 02_funnel_analysis.R      # Funnel, drop-off, channel conversion
-│   ├── 03_retention_cohorts.R    # Cohort curves, DAU/MAU, stickiness
-│   └── 04_predictive_model.R     # Power user model, A/B framework
-├── data/                         # Generated datasets (git-ignored)
-├── outputs/                      # CSVs: metrics, segments, results (git-ignored)
+├── scripts/                         # Original project implementation
+├── corrected_r/
+│   ├── README.md                     # Audit notes and corrected methodology
+│   └── scripts/                      # Focused corrected analysis scripts
 ├── shiny/
-│   └── app.R                     # Interactive dashboard (4 tabs)
-├── retentionanalytics_report.qmd # Quarto HTML report
+│   └── app.R                         # Report-snapshot dashboard
+├── retentionanalytics_report.qmd     # Report-snapshot analytical report
 └── README.md
 ```
 
----
+## Tools and methods
 
-## Reproducing the Project
-
-```r
-# Install dependencies
-install.packages(c("tidyverse", "pROC", "shiny", "bslib", "bsicons"))
-
-# Run in order from project root
-source("scripts/01_simulate_data.R")
-source("scripts/02_funnel_analysis.R")
-source("scripts/03_retention_cohorts.R")
-source("scripts/04_predictive_model.R")
-
-# Launch dashboard
-shiny::runApp("shiny/")
-
-# Render report
-quarto::quarto_render("retentionanalytics_report.qmd")
-```
-
----
-
-## Why This Matters for Product Teams
-
-Retention and funnel analytics require a combination of statistical precision (correct cohort definition, valid A/B testing, novelty-effect awareness) and product intuition (which metrics matter, which drop-off points are actionable). This project demonstrates both - and delivers outputs in formats that serve data scientists, product managers, and leadership simultaneously.
-
----
+R, tidyverse, ggplot2, Shiny, logistic regression, funnel conversion, cohort retention, DAU/MAU, classification metrics, two-proportion testing, and simulation.
 
 ## Author
 
-**Ludovic Njiosseu** | MS Biostatistics, NYU | Data Scientist & Statistician  
-5+ years across healthcare, pharma, financial analytics, and consumer products  
-Open to roles in product analytics, growth data science, and applied ML
+**Ludovic Njiosseu** | MPH in Biostatistics, NYU | Data Scientist & Statistician  
+5+ years across healthcare, pharma, statistical analysis, and applied data science.
