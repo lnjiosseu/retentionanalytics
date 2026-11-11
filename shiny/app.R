@@ -48,14 +48,14 @@ ui <- page_navbar(
   ),
   nav_panel("Funnel Analysis",
     navset_card_tab(
-      nav_panel("Funnel Performance",
+      nav_panel("Funnel Analysis: Funnel Performance",
         layout_columns(
           card(card_header("Overall funnel"), plotOutput("funnel_detail",height=330)),
           card(card_header("Conversion by acquisition channel"), plotOutput("channel",height=330))
         ),
         card(card_header("Funnel by plan"), tableOutput("plan"))
       ),
-      nav_panel("Drop-off & Scenarios",
+      nav_panel("Funnel Analysis: Drop-off & Scenarios",
         card(card_header("Drop-off ranking"), tableOutput("drop")),
         card(card_header("Illustrative activation scenario"), tableOutput("projection")),
         p(class="text-muted","The activation scenario is a mechanical projection that holds downstream conditional conversion rates constant. It is not a causal estimate.")
@@ -64,7 +64,7 @@ ui <- page_navbar(
   ),
   nav_panel("Retention & Engagement",
     navset_card_tab(
-      nav_panel("Retention & Cohorts",
+      nav_panel("Retention & Engagement: Retention & Cohorts",
         layout_columns(
           card(card_header("Retention by plan"), plotOutput("retplan",height=320)),
           card(card_header("Power vs. regular users"), plotOutput("retpower",height=320))
@@ -73,7 +73,7 @@ ui <- page_navbar(
           p(class="text-muted","Each bar represents one monthly signup cohort. Labels show month-6 retention and cohort size."),
           plotOutput("m6",height=380))
       ),
-      nav_panel("Product Engagement",
+      nav_panel("Retention & Engagement: Product Engagement",
         layout_columns(
           card(card_header("DAU/MAU summary"), tableOutput("stickiness")),
           card(card_header("Session engagement"), tableOutput("engagement"))
