@@ -31,7 +31,7 @@ These values are historical baseline outputs, not the figures in the later Nov. 
 
 ## Corrected analysis work
 
-The `audit/corrected-r-baseline` branch contains a separate `corrected_r/` area. It adds a complete daily DAU calendar, descriptive M6 segmentation, and a user-level randomized A/B simulation with a two-sided week-4 endpoint and confidence interval. It deliberately avoids publishing new model-performance claims until the complete pipeline has been run and reviewed. See [corrected analysis README](https://github.com/lnjiosseu/retentionanalytics/blob/audit/corrected-r-baseline/corrected_r/README.md).
+The `corrected_r/` directory is now included on `main` (and retained on the audit branch). It adds a complete daily DAU calendar, descriptive M6 segmentation, and a user-level randomized A/B simulation with a two-sided week-4 endpoint and confidence interval. It deliberately avoids publishing new model-performance claims until the complete pipeline has been run and reviewed. See [corrected analysis README](corrected_r/README.md).
 
 ## Reproduction
 
