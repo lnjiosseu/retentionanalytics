@@ -6,6 +6,7 @@
 library(shiny)
 library(bslib)
 library(DT)
+library(DT)
 
 funnel <- data.frame(
   Stage = c("Signup", "Onboarding", "Activation", "Engagement", "Conversion"),
