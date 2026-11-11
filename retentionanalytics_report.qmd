@@ -41,8 +41,9 @@ knitr::kable(funnel, digits = 2)
 ```
 
 ```{r}
-ggplot(funnel, aes(step, pct_of_signups)) +
+ggplot(funnel, aes(x = step, y = pct_of_signups)) +
   geom_col(fill = "#2878a5") +
+  scale_x_discrete(limits = c("Signup", "Onboarding", "Activation", "Engagement", "Conversion"), drop = FALSE) +
   labs(x = NULL, y = "Percent of signups") +
   theme_minimal()
 ```
