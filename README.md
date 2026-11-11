@@ -117,13 +117,15 @@ The screenshots below allow the dashboard to be reviewed without running the app
 
 The reproducible report source is available in [`retentionanalytics_report.qmd`](retentionanalytics_report.qmd). It covers the conversion funnel, cohort retention, activity and engagement, predictive modeling, the independent experiment, limitations, and instructions for reproducing the analysis.
 
-Render the standalone HTML report locally after running the four corrected analysis scripts:
+A rendered HTML report snapshot is also committed at [`retentionanalytics_report.html`](retentionanalytics_report.html). It can be opened or downloaded from the repository. The HTML file is a static report artifact, not a live dashboard or a GitHub Pages deployment.
+
+To regenerate the report locally after running the four corrected analysis scripts:
 
 ```r
 quarto::quarto_render("retentionanalytics_report.qmd")
 ```
 
-The rendered HTML report is generated locally and is not implied to be publicly hosted.
+Commit the regenerated HTML file when you want the repository's report snapshot to reflect updated analysis outputs.
 
 ## Repository structure
 
@@ -142,6 +144,7 @@ retentionanalytics/
 ├── docs/
 │   └── screenshots/                  # Dashboard screenshots
 ├── retentionanalytics_report.qmd     # Reproducible Quarto report source
+├── retentionanalytics_report.html   # Committed rendered report snapshot
 ├── retentionanalytics.Rproj
 └── README.md
 ```
