@@ -1,0 +1,45 @@
+name: Corrected RetentionAnalytics pipeline
+
+on:
+  push:
+    branches:
+      - audit/corrected-retention-baseline
+    paths:
+      - 'corrected_r/**'
+      - 'shiny/**'
+      - 'retentionanalytics_report.qmd'
+      - '.github/workflows/corrected-pipeline-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-and-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/corrected-retention-baseline
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.2'
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - name: Install analysis and dashboard packages
+        run: Rscript -e 'install.packages(c("tidyverse","pROC","shiny","bslib","bsicons","DT","scales"))'
+      - name: Generate corrected synthetic lifecycle data
+        run: Rscript corrected_r/scripts/01_simulate_data.R
+      - name: Run corrected funnel analysis
+        run: Rscript corrected_r/scripts/02_funnel_analysis.R
+      - name: Run corrected cohort and engagement analysis
+        run: Rscript corrected_r/scripts/03_retention_cohorts.R
+      - name: Fit retention model and simulated experiment
+        run: Rscript corrected_r/scripts/04_predictive_model.R
+      - name: Validate generated outputs and reported metrics
+        run: |
+          Rscript -e 'u <- readr::read_csv("corrected_r/data/users.csv", show_col_types=FALSE); s <- readr::read_csv("corrected_r/data/sessions.csv", show_col_types=FALSE); f <- readr::read_csv("corrected_r/outputs/funnel_overall.csv", show_col_types=FALSE); r <- readr::read_csv("corrected_r/outputs/retention_curve_overall.csv", show_col_types=FALSE); m <- readr::read_csv("corrected_r/outputs/retention_model_metrics.csv", show_col_types=FALSE); a <- readr::read_csv("corrected_r/outputs/ab_period_tests.csv", show_col_types=FALSE); stopifnot(nrow(u)==5000, nrow(f)==5, nrow(r)==12, nrow(m)==7, nrow(a)==2, abs(f$pct_of_signups[f$step=="Conversion"]-12.94)<0.15, abs(r$retention_rate_pct[r$months_since_signup==6]-31.26)<0.15, abs(m$value[m$metric=="ROC-AUC"]-0.567)<0.06, as.integer(m$value[m$metric=="Test observations"])==1001); cat(sprintf("Generated users=%d sessions=%d; funnel, retention, model and experiment outputs passed checks.\n", nrow(u), nrow(s)))'
+      - name: Render Quarto report
+        run: quarto render retentionanalytics_report.qmd
+      - name: Smoke-test Shiny app initialization
+        run: Rscript -e 'app <- shiny::shinyAppFile("shiny"); stopifnot(inherits(app, "shiny.appobj")); cat("Shiny app initialized.\n")'
