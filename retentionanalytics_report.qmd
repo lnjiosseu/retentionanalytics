@@ -1,6 +1,6 @@
 ---
 title: "RetentionAnalytics: Product Retention & Funnel Analysis"
-author: "Ludovic Njiosseu, MS Statistics, NYU"
+author: "Ludovic Njiosseu, MPH (Biostatistics), NYU"
 date: today
 format:
   html:
@@ -16,7 +16,7 @@ execute:
 
 ## Executive summary
 
-This report summarizes a reproducible synthetic product analytics workflow. All user and experiment records are simulated. The report must be rendered only after running the four scripts in `corrected_r/scripts/` in order.
+This report summarizes the corrected synthetic product analytics workflow. All user and experiment records are simulated. The reported run covers 5,000 users and 92,072 generated session events. The overall signup-to-conversion rate is 12.94%, and overall month-6 retention is 31.26%. The report must be rendered only after running the four scripts in `corrected_r/scripts/` in order.
 
 ```{r}
 library(tidyverse)
@@ -24,6 +24,8 @@ out <- "corrected_r/outputs"
 funnel <- read_csv(file.path(out, "funnel_overall.csv"), show_col_types = FALSE)
 retention <- read_csv(file.path(out, "retention_curve_overall.csv"), show_col_types = FALSE)
 model <- read_csv(file.path(out, "retention_model_metrics.csv"), show_col_types = FALSE)
+ab <- read_csv(file.path(out, "ab_experiment_summary.csv"), show_col_types = FALSE)
+ab_tests <- read_csv(file.path(out, "ab_period_tests.csv"), show_col_types = FALSE)
 ```
 
 ## Conversion funnel
@@ -77,17 +79,15 @@ A logistic regression predicts month-6 retention using first-month features. Dat
 knitr::kable(model, digits = 3)
 ```
 
-The model is a baseline demonstration. Coefficients are associations under the synthetic data-generating process, not causal effects or evidence of real customer behavior.
+The reported held-out test ROC-AUC is 0.567 (test n = 1,001). At the validation-selected threshold of 0.346, precision is 40.6%, recall is 32.9%, specificity is 78.1%, and accuracy is 63.9%. This is a weak baseline model. Coefficients are associations under the synthetic data-generating process, not causal effects or evidence of real customer behavior.
 
 ## Randomized experiment illustration
 
 The A/B experiment is independently simulated and is not drawn from the 5,000-user retention dataset. Its weekly retention probabilities are stipulated inputs. Early-versus-late comparisons illustrate a decaying treatment effect; they do not estimate an empirical novelty effect.
 
 ```{r}
-ab <- read_csv(file.path(out, "ab_experiment_summary.csv"), show_col_types = FALSE)
-ab_tests <- read_csv(file.path(out, "ab_period_tests.csv"), show_col_types = FALSE)
-knitr::kable(ab, digits = 2)
-knitr::kable(ab_tests, digits = 3)
+knitr::kable(ab, digits = 2, caption = "Independent simulated experiment by arm")
+knitr::kable(ab_tests, digits = 3, caption = "Early-versus-later period comparisons")
 ```
 
 ## Limitations
